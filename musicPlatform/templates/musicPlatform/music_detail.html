@@ -1,0 +1,54 @@
+{% extends 'registration/base.html' %}
+{% block title %}
+{{ music.artist }} - {{ music.title }}
+{% endblock %}
+{% block nav_title %}
+   {{ music.title }}-({{ music.artist }})
+{% endblock %}
+{% block nav_artist %}
+   {{ music.artist }}
+{% endblock %}
+
+{% block content %}
+    <div class=" flex justify-right" xmlns="http://www.w3.org/1999/html">
+           <img src="{{ music.image.url }}" width="500" height="500"/>
+           <p class="text-left text-white text-l"> {{music.loi}}</p>
+       </div>
+       <div class ="flex justify-left">
+           <audio src="{{ music.url }}" width="500" height='110' autoplay />
+       </div>
+        <div class="mt-1 ">
+        {% if user.is_authenticated %}
+            <form method="POST" action ={% url 'music.review' music.id %} enctype="multipart/form-data">
+                {% csrf_token %}
+                <textarea
+                    class = "float-right border rounded p-2 align-right",
+                    name="review"
+                    placeholder="Write your reviews",
+                    rows= "5",
+                    cols="100"
+            ></textarea>
+               <input type="file" name="image">
+                <button type="submit"
+                        class = "float-right border rounded p-2 bg-gray-800 text-white">Submit</button>
+            </form>
+             </div>
+         {% else %}
+    <div class="text-white" >
+        <a class="text-blue-600" href="{% url 'login' %}?next={{ request.path }}" >Login</a> to write your comment<3333
+    </div>
+         {% endif %}
+        </div>
+    <div class = "mt-3 text-left text-white text-xl">
+    {% for review in reviews %}
+        <div class="my-6" >
+        <p class ="text-gray-400">{{ review.user }}</p>
+        <p class ="text-gray-400">{{ review.create_at}}</p>
+        </div>
+        <p>{{ review.body }}</p>
+            <img src="{{review.image}}" width="100" >
+        {% endfor %}
+    </div>
+{% endblock %}
+
+

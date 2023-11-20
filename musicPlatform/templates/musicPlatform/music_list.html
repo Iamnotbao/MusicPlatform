@@ -1,0 +1,91 @@
+{% extends 'registration/base.html' %}
+{% block title %}
+    Keeping Your Soul in peace :3333
+{% endblock %}
+{% block nav_title %}
+    Music Playlists
+{% endblock %}
+{% block search_bar %}
+    <form action="{% url 'search' %}" method="get">
+        {% csrf_token %}
+        <input style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 600px; height: 40px"
+               type="text"
+               name="q"
+               placeholder="Search"
+        >
+        <input
+                style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;"
+                type="submit"
+                value="Search"
+        >
+    </form>
+    <div>
+        <div id='result' style="background-color: azure">
+            Your result text
+        </div>
+        <br>
+        <div id='record'>
+            <button onclick="startConverting()"  style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;" id="re">record</button>
+            <button style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;" value="Send" id="send">Send</button>
+        </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            function startConverting() {
+                document.getElementById("re").style.visibility = "hidden"
+                var r = document.getElementById('result')
+                var spr = new webkitSpeechRecognition();
+                spr.continuous = false;
+                spr.interimResults = true;
+                spr.lang = 'en-IN';
+                spr.start();
+                var ftr = '';
+                spr.onresult = function (event) {
+                    var interimTranscripts = '';
+                    for (var i = event.resultIndex; i < event.results.length; i++) {
+                        var transcript=event.results[i][0].transcript;
+                        transcript.replace("\n", "<br>")
+                        if (event.results[i].isFinal) {
+                            ftr+=transcript;
+                        } else
+                            interimTranscripts += transcript;
+                    }
+                    r.innerHTML = ftr + interimTranscripts;
+                }
+                spr.onerror = function (event) {
+                };
+            }
+            $(document).ready(function () {
+                $("#send").click(function (event) {
+                    $.ajax({
+                        type: "POST",
+                        url: 'search_audio/',
+                        data: {
+                            send: $('#result').html()
+                        },
+                        success: function () {
+                            alert("Audio successfully Submitted");
+                        }
+
+                    });
+                });
+            });
+        </script>
+    </div>
+{% endblock %}
+{% block content %}
+
+    <div class="grid grid-cols-4 gap-4 mt-10">
+        {% for music in music_list %}
+            <a href="{% url 'music.show' music.id %}"
+               class="justify-self-center text-center my-4"
+               target="_blank">
+                <div class="flex justify-center">
+                    <img src="{{ music.image.url }}" width="200"/>
+                </div>
+                <p class="text-lg text-white">{{ music.title }}</p>
+
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}
