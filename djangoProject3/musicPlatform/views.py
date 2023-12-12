@@ -4,6 +4,8 @@ from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_exempt
+import re
+
 from django.http import HttpResponse
 import googlemaps
 # Create your views here.
@@ -50,12 +52,30 @@ class MusicSearchView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get('q')
+        query=re.sub('[.]', '',query )
+        self.request.session['search_by_title'] = query
+        print( self.request.session['search_by_title'])
+
         return Music.objects.filter(title__icontains=query).order_by('-create_at')
+
 
 class MusicSearchVoiceView(ListView):
     model = Music
 
     @csrf_exempt
+    def __init__(self, **kwargs):
+        super().__init__(kwargs)
+        self.object = None
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+
+
+
+
     def audio_data(request):
         if request.method == 'POST':
 

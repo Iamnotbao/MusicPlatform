@@ -37,13 +37,21 @@
         <a href="{% url 'login' %}" class="p-2 rounded bg-blue-700 text-white">Login</a>
     </div>
  {% endif %}
+{% block notFound %}
 
+{% endblock %}
 
 
 
 </div>
 </div>
 </nav>
+{% block title_display  %}
+
+{% endblock %}
+{% block op %}
+
+{% endblock %}
 <h2 class="flex justify-center w3-btn">
     {% block search_bar %}
 

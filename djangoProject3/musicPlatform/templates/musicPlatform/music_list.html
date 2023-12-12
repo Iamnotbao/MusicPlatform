@@ -5,13 +5,27 @@
 {% block nav_title %}
     Music Playlists
 {% endblock %}
+{% block title_display  %}
+    <div class="text-white">
+	 {{ request.session.search_by_title }}
+    </div>
+{% endblock %}
+{% block op %}
+      <script>
+        var r = document.getElementById('search_by_voice')
+        r.value=  {{ request.session.search_by_title  }}
+    </script>
+{% endblock %}
 {% block search_bar %}
     <form action="{% url 'search' %}" method="get">
         {% csrf_token %}
         <input style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 600px; height: 40px"
+               id="search_by_voice"
                type="text"
                name="q"
                placeholder="Search"
+
+               value="{{ request.session.search_by_title  }}"
         >
         <input
                 style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;"
@@ -19,21 +33,18 @@
                 value="Search"
         >
     </form>
-    <div>
-        <div id='result' style="background-color: azure">
-            Your result text
-        </div>
-        <br>
+    {% csrf_token %}
         <div id='record'>
             <button onclick="startConverting()"  style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;" id="re">record</button>
-            <button style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;" value="Send" id="send">Send</button>
         </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
         <script>
             function startConverting() {
+
                 document.getElementById("re").style.visibility = "hidden"
-                var r = document.getElementById('result')
+                var r = document.getElementById('search_by_voice')
                 var spr = new webkitSpeechRecognition();
                 spr.continuous = false;
                 spr.interimResults = true;
@@ -43,33 +54,18 @@
                 spr.onresult = function (event) {
                     var interimTranscripts = '';
                     for (var i = event.resultIndex; i < event.results.length; i++) {
-                        var transcript=event.results[i][0].transcript;
+                        var transcript = event.results[i][0].transcript;
                         transcript.replace("\n", "<br>")
                         if (event.results[i].isFinal) {
-                            ftr+=transcript;
+                            ftr += transcript;
                         } else
                             interimTranscripts += transcript;
                     }
-                    r.innerHTML = ftr + interimTranscripts;
+                    r.value = ftr + interimTranscripts;
                 }
                 spr.onerror = function (event) {
                 };
             }
-            $(document).ready(function () {
-                $("#send").click(function (event) {
-                    $.ajax({
-                        type: "POST",
-                        url: 'search_audio/',
-                        data: {
-                            send: $('#result').html()
-                        },
-                        success: function () {
-                            alert("Audio successfully Submitted");
-                        }
-
-                    });
-                });
-            });
         </script>
     </div>
 {% endblock %}
