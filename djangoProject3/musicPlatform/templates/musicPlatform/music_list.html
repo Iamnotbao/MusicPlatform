@@ -3,7 +3,7 @@
     Keeping Your Soul in peace :3333
 {% endblock %}
 {% block nav_title %}
-    Music Playlists
+        <a href="{% url 'music.all' %}">Music Playlists</a>
 {% endblock %}
 {% block title_display  %}
     <div class="text-white">
@@ -11,11 +11,21 @@
     </div>
 {% endblock %}
 {% block op %}
-      <script>
-        var r = document.getElementById('search_by_voice')
-        r.value=  {{ request.session.search_by_title  }}
+    <script>
+  window.onload = function() {
+    var r = document.getElementById('search_by_voice');
+    var res = "{{ request.session.search_by_title }}";
+    if(res === 'none'){
+        r.value="";
+        alert('Cannot found song!!!');
+    } else{
+        r.value=res;
+    }
+};
+
     </script>
 {% endblock %}
+
 {% block search_bar %}
     <form action="{% url 'search' %}" method="get">
         {% csrf_token %}

@@ -53,8 +53,11 @@ class MusicSearchView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q')
         query=re.sub('[.]', '',query )
-        self.request.session['search_by_title'] = query
-        print( self.request.session['search_by_title'])
+        if Music.objects.filter(title__icontains=query).order_by('-create_at'):
+            self.request.session['search_by_title'] = query
+            print( self.request.session['search_by_title'])
+        elif not Music.objects.filter(title__icontains=query).order_by('-create_at'):
+            self.request.session['search_by_title'] = 'none'
 
         return Music.objects.filter(title__icontains=query).order_by('-create_at')
 

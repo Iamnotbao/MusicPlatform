@@ -11,7 +11,7 @@
 
 {% block content %}
     <div class=" flex justify-right" xmlns="http://www.w3.org/1999/html">
-           <img src="{{ music.image.url }}" width="500" height="500"/>
+           <img src="{{ music.image.url }}" style="width: 500px; height: 500px"/>
            <p class="text-left text-white text-l"> {{music.loi}}</p>
        </div>
        <div class ="flex justify-left">
@@ -28,7 +28,7 @@
                     rows= "5",
                     cols="100"
             ></textarea>
-                <
+
                <input type="file" name="image">
                 <button type="submit"
                         class = "float-right border rounded p-2 bg-gray-800 text-white">Submit</button>
