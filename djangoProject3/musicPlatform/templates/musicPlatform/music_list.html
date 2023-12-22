@@ -2,26 +2,24 @@
 {% block title %}
     Keeping Your Soul in peace :3333
 {% endblock %}
-{% block nav_title %}
-        <a href="{% url 'music.all' %}">Music Playlists</a>
-{% endblock %}
-{% block title_display  %}
+
+{% block title_display %}
     <div class="text-white">
-	 {{ request.session.search_by_title }}
+        {{ request.session.search_by_title }}
     </div>
 {% endblock %}
 {% block op %}
     <script>
-  window.onload = function() {
-    var r = document.getElementById('search_by_voice');
-    var res = "{{ request.session.search_by_title }}";
-    if(res === 'none'){
-        r.value="";
-        alert('Cannot found song!!!');
-    } else{
-        r.value=res;
-    }
-};
+        window.onload = function () {
+            var r = document.getElementById('search_by_voice');
+            var res = "{{ request.session.search_by_title }}";
+            if (res === 'none') {
+                r.value = "";
+                alert('Cannot found song!!!');
+            } else {
+                r.value = res;
+            }
+        };
 
     </script>
 {% endblock %}
@@ -29,13 +27,13 @@
 {% block search_bar %}
     <form action="{% url 'search' %}" method="get">
         {% csrf_token %}
-        <input style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 600px; height: 40px"
+        <input style="border: 1px solid #ccc; padding: 10px; border-radius: 5px; width: 600px; height: 40px; color: black"
                id="search_by_voice"
                type="text"
                name="q"
                placeholder="Search"
 
-               value="{{ request.session.search_by_title  }}"
+               value="{{ request.session.search_by_title }}"
         >
         <input
                 style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;"
@@ -44,39 +42,42 @@
         >
     </form>
     {% csrf_token %}
-        <div id='record'>
-            <button onclick="startConverting()"  style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;" id="re">record</button>
-        </div>
+    <div id='record'>
+        <button onclick="startConverting()"
+                style="background-color: #007bff; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer;"
+                id="re">record
+        </button>
+    </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-        <script>
-            function startConverting() {
+    <script>
+        function startConverting() {
 
-                document.getElementById("re").style.visibility = "hidden"
-                var r = document.getElementById('search_by_voice')
-                var spr = new webkitSpeechRecognition();
-                spr.continuous = false;
-                spr.interimResults = true;
-                spr.lang = 'en-IN';
-                spr.start();
-                var ftr = '';
-                spr.onresult = function (event) {
-                    var interimTranscripts = '';
-                    for (var i = event.resultIndex; i < event.results.length; i++) {
-                        var transcript = event.results[i][0].transcript;
-                        transcript.replace("\n", "<br>")
-                        if (event.results[i].isFinal) {
-                            ftr += transcript;
-                        } else
-                            interimTranscripts += transcript;
-                    }
-                    r.value = ftr + interimTranscripts;
+            document.getElementById("re").style.visibility = "hidden"
+            var r = document.getElementById('search_by_voice')
+            var spr = new webkitSpeechRecognition();
+            spr.continuous = false;
+            spr.interimResults = true;
+            spr.lang = 'en-IN';
+            spr.start();
+            var ftr = '';
+            spr.onresult = function (event) {
+                var interimTranscripts = '';
+                for (var i = event.resultIndex; i < event.results.length; i++) {
+                    var transcript = event.results[i][0].transcript;
+                    transcript.replace("\n", "<br>")
+                    if (event.results[i].isFinal) {
+                        ftr += transcript;
+                    } else
+                        interimTranscripts += transcript;
                 }
-                spr.onerror = function (event) {
-                };
+                r.value = ftr + interimTranscripts;
             }
-        </script>
+            spr.onerror = function (event) {
+            };
+        }
+    </script>
     </div>
 {% endblock %}
 {% block content %}
@@ -87,11 +88,220 @@
                class="justify-self-center text-center my-4"
                target="_blank">
                 <div class="flex justify-center">
-                    <img src="{{ music.image.url }}" width="200"/>
+                    <img src="{{ music.image.url }}" width="200" style="border-radius:5px"/>
                 </div>
                 <p class="text-lg text-white">{{ music.title }}</p>
 
             </a>
         {% endfor %}
     </div>
+{% endblock %}
+{% block chatbot %}
+    <button id="chatbutton" class="open-button" onclick="openForm()">Chat</button>
+    <div class="chat-container" id="myForm">
+        <div class="card flex-grow-1">
+
+
+            <div class="card-body messages-box">
+
+                <ul class="list-unstyled messages-list">
+                    <li class="message received">
+                        <div class="message-text">
+                            <div class="message-sender">
+                                <b>AI Chatbot</b>
+                            </div>
+                            <div class="message-content">
+                                Hi {{ user.username }}, I am your AI Chatbot, you can ask me anything.
+                            </div>
+                        </div>
+                    </li>
+
+
+                    {% for chat in chats %}
+                        {% if chat.user == request.user %}
+
+                            <li class="message sent">
+                                <div class="message-text">
+                                    <div class="message-sender">
+                                        <b>You</b>
+                                    </div>
+                                    <div class="message-content">
+                                        {{ chat.message }}
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="message received">
+                                <div class="message-text">
+                                    <div class="message-sender">
+                                        <b>AI Chatbot</b>
+                                    </div>
+                                    <div class="message-content">
+                                        {{ chat.response }}
+
+                                    </div>
+                                </div>
+                            </li>
+
+                        {% endif %}
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+            <form class="message-form">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" class="form-control message-input" placeholder="Type your message...">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary sendButton">Send</button>
+                        <button type="submit" value="btn btn-primary Close" onclick="closeForm()" class="closeButton"
+                                id="buttonInput">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <script>
+        function updateScroll() {
+            var messagesList = document.querySelector('.messages-list');
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+
+        // Call updateScroll function when a new message is received
+        updateScroll();
+    </script>
+    <script>
+
+        function openForm() {
+            document.getElementById("myForm").style.display = "block";
+            document.getElementById("chatbutton").style.display = "none"
+        }
+
+        function closeForm() {
+            document.getElementById("myForm").style.display = "none";
+            document.getElementById("chatbutton").style.display = "block"
+        }
+    </script>
+    <script>
+        const messagesList = document.querySelector('.messages-list');
+        const messageForm = document.querySelector('.message-form');
+        const messageInput = document.querySelector('.message-input');
+
+        messageForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const message = messageInput.value.trim();
+            if (message.length === 0) {
+                return;
+            }
+
+            const messageItem = document.createElement('li');
+            messageItem.classList.add('message', 'sent');
+            messageItem.innerHTML = `
+        <div class="message-text">
+            <div class="message-sender">
+                <b>You</b>
+            </div>
+            <div class="message-content">
+                ${message}
+            </div>
+        </div>`;
+
+            messagesList.appendChild(messageItem);
+            updateScroll()
+            messageInput.value = '';
+
+            fetch('', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: new URLSearchParams({
+                    'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'message': message
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const response = data.response;
+                    const messageItem = document.createElement('li');
+                    messageItem.classList.add('message', 'received');
+                    messageItem.innerHTML = `
+        <div class="message-text">
+            <div class="message-sender">
+              <b>AI Chatbot</b>
+            </div>
+            <div class="message-content">
+                ${response}
+
+            </div>
+        </div>
+          `;
+
+                    messagesList.appendChild(messageItem);
+                    updateScroll()
+                });
+        });
+
+    </script>
+{% endblock %}
+{% block styles %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+
+        }
+
+
+        {
+            box-sizing: border-box
+        }
+
+
+        .sendButton {
+            background-color: aqua;
+            border: solid lawngreen;
+        }
+
+        .closeButton {
+            background-color: aqua;
+            border: solid lawngreen;
+
+        }
+
+        .open-button {
+            background-color: olivedrab;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            opacity: 0.8;
+            position: fixed;
+            bottom: 10px;
+            right: 28px;
+            width: 280px;
+        }
+
+        .chat-container {
+            background-color: white;
+            display: none;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            border: 3px solid lawngreen;
+            z-index: 9;
+
+            margin-left: 70%;
+            margin-top: 50%;
+        }
+
+        .messages-list {
+            overflow-y: scroll;
+            max-height: 500px;
+
+        }
+    </style>
 {% endblock %}

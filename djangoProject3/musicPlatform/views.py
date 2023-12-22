@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from musicPlatform.models import Music, Review
 from django.views.generic import ListView, DetailView
@@ -6,18 +7,70 @@ from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_exempt
 import re
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import googlemaps
-# Create your views here.
+
+import openai
+
+from .models import Chat
+
+from django.utils import timezone
+
+openai_api_key = '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'
+openai.api_key = openai_api_key
+
+
+def register(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+
+        if password1 == password2:
+            try:
+                user = User.objects.create_user(username, email, password1)
+                user.save()
+                return redirect('register')
+            except:
+                error_message = 'Error creating account'
+                return render(request, 'registration/register.html', {'error_message': error_message})
+        else:
+            error_message = 'Password dont match'
+            return render(request, 'registration/register.html', {'error_message': error_message})
+    return render(request, 'registration/register.html')
+
+
 class MusicListView(ListView):
     def get_queryset(self):
         return Music.objects.all()
 
+    def ask_openai(self, message):
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo-16k",
+            messages=[
+                {"role": "system", "content": "You are an helpful assistant."},
+                {"role": "user", "content": message},
+            ]
+        )
 
-# def index(request):
-#    dbData = Music.objects.all()
-#   context = {'musics': dbData}
-#   return render(request, 'musicPlatform/music_list.html', context)
+        answer = response.choices[0].message.content.strip()
+        return answer
+
+    def post(self, request):
+        message = request.POST.get('message')
+        response = self.ask_openai(message)
+
+        chat = Chat(user=request.user, message=message, response=response, created_at=timezone.now())
+        chat.save()
+        return JsonResponse({'message': message, 'response': response})
+
+    def get(self, request):
+        chats = Chat.objects.filter(user=request.user.id)
+        musics = Music.objects.all()
+        return render(request, 'musicPlatform/music_list.html', {'chats': chats, 'music_list': musics})
+
+
 class MusicDetailView(DetailView):
     model = Music
 
@@ -52,47 +105,11 @@ class MusicSearchView(ListView):
 
     def get_queryset(self):
         query = self.request.GET.get('q')
-        query=re.sub('[.]', '',query )
+        query = re.sub('[.]', '', query)
         if Music.objects.filter(title__icontains=query).order_by('-create_at'):
             self.request.session['search_by_title'] = query
-            print( self.request.session['search_by_title'])
+            print(self.request.session['search_by_title'])
         elif not Music.objects.filter(title__icontains=query).order_by('-create_at'):
             self.request.session['search_by_title'] = 'none'
 
         return Music.objects.filter(title__icontains=query).order_by('-create_at')
-
-
-class MusicSearchVoiceView(ListView):
-    model = Music
-
-    @csrf_exempt
-    def __init__(self, **kwargs):
-        super().__init__(kwargs)
-        self.object = None
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
-
-
-
-
-
-    def audio_data(request):
-        if request.method == 'POST':
-
-            # Authenticating API
-            gmaps = googlemaps.Client(key='YOUR_API_KEY')
-
-            # Calling google geocode API with query as a Address
-            geocode_result = gmaps.geocode(request.POST['send'])
-
-            # geocode_result will return a JSON, contents can be extracted
-            # for example
-            x = geocode_result[0]['geometry']['location']['lat']  # get latitute for the query
-            y = geocode_result[0]['geometry']['location']['lng']  # get longitude for the query
-
-        else:
-            message = "Please check the POST call"
-        return HttpResponse(message)

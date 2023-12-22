@@ -14,55 +14,62 @@
 
         {% endblock %}
     </title>
+
 </head>
 <body style="background-image: url('https://anhdepfree.com/wp-content/uploads/2022/12/hinh-nen-may-tinh-4k-chill_22343462136-1080x608.jpg')">
+
 <nav class="p-4 flex justify-between bg-green-800 text-white w-full">
-<div class="flex flex-col justify-center">
-    <p>
-        <a href="{% url 'music.all' %}"> Music World</a>
+    <div class="text-left text-4xl">
+        <p>
+            <a href="{% url 'music.all' %}"> Music World</a>
         </p>
-</div>
-
-<h1 class="text-center text-4xl">
-    {% block nav_title %}
-
-    {% endblock %}
-</h1>
-
-<div class="flex justify-end">
-    {% if user.is_authenticated %}
-
-    <div>
-    <a href="{% url 'logout' %}" class="p-2 rounded bg-gray-700 text-white">Logout</a>
-    {% else %}
-    <div >
-        <a href="{% url 'login' %}" class="p-2 rounded bg-blue-700 text-white">Login</a>
     </div>
- {% endif %}
-{% block notFound %}
-
-{% endblock %}
 
 
+    <h1 class="flex justify-center w3-btn">
+        {% block nav_title %}
+        {% endblock %}
+        {% block search_bar %}
 
-</div>
-</div>
+        {% endblock %}
+        {% block op %}
+
+        {% endblock %}
+    </h1>
+
+
+    <div class="flex justify-end">
+        {% if user.is_authenticated %}
+
+            <div>
+            <a href="{% url 'logout' %}" class="p-2 rounded bg-gray-700 text-white">Logout</a>
+        {% else %}
+            <div>
+                <a href="{% url 'login' %}" class="p-2 rounded bg-blue-700 text-white">Login</a>
+            </div>
+        {% endif %}
+        {% block notFound %}
+
+        {% endblock %}
+
+
+
+        </div>
+    </div>
 </nav>
-{% block title_display  %}
 
-{% endblock %}
-{% block op %}
 
-{% endblock %}
-<h2 class="flex justify-center w3-btn">
-    {% block search_bar %}
+<section class="py-10">
+    {% block content %}
 
     {% endblock %}
-</h2>
-<section class="py-10">
-       {% block content %}
+    {% block chatbot %}
 
-     {% endblock %}
+    {% endblock %}
+
+    {% block styles %}
+
+    {% endblock %}
 </section>
 </body>
 </html>

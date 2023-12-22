@@ -20,9 +20,12 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 
+from musicPlatform import views
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('musicPlatform/', include('musicPlatform.urls')),
-    path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True)),
-    path('', include('django.contrib.auth.urls'))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                  path('admin/', admin.site.urls),
+                  path('musicPlatform/', include('musicPlatform.urls')),
+                  path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True)),
+                  path('', include('django.contrib.auth.urls')),
+                  path('register/', views.register, name='register'),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

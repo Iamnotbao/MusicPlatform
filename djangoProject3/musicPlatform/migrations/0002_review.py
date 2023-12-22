@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('musicPlatform', '0001_initial'),
     ]
@@ -17,7 +16,8 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('body', models.TextField()),
                 ('create_at', models.DateTimeField(auto_now=True)),
-                ('music', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='musicPlatform.music')),
+                ('music',
+                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='musicPlatform.music')),
             ],
         ),
     ]

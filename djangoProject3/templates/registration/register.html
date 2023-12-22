@@ -1,0 +1,40 @@
+{% extends 'registration/base.html' %}
+
+{% block title %}Register{% endblock %}
+
+
+{% block content %}
+
+
+
+
+
+    <form class="bg-blue-100 p-4 rounded shadow" method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        <div class="flex justify-right">
+            <div class="mr-4"><label for="username">Username</label></div>
+            <div></div>
+            <input type="text" class="form-control" id="username" name="username" required></div>
+        </div>
+        <div class="flex justify-right">
+            <div class="mr-4"><label for="email">Email</label></div>
+            <div><input type="text" class="form-control" id="email" name="email" required></div>
+        </div>
+        <div class="flex justify-right">
+            <div class="mr-4"><label for="password1">Password</label></div>
+            <div><input type="password" class="form-control" id="password1" name="password1" required></div>
+        </div>
+        <div class="flex justify-right">
+            <div class="mr-4"><label for="password2">Confirm Password</label></div>
+            <div><input type="password" class="form-control" id="password2" name="password2" required></div>
+        </div>
+        <button class="py-1 px-2 mt-5 bg-green-400 text-white rounded w-full cursor-pointer hover:bg-green-800  "
+                type="submit">Register
+        </button>
+    </form>
+    {% if error_message %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+    {% endif %}
+
+
+{% endblock %}

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('musicPlatform', '0007_remove_music_artwork_review_image'),
     ]

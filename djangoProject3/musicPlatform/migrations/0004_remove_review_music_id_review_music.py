@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('musicPlatform', '0003_remove_review_music_review_music_id'),
     ]
